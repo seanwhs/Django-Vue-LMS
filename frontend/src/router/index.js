@@ -4,6 +4,7 @@ import HomeView from '../views/HomeView.vue'
 import AboutView from '../views/AboutView.vue'
 import SignUp from '../views/SignUp.vue'
 import LogIn from '../views/LogIn.vue'
+import Courses from '../views/Courses.vue'
 
 import MyAccount from '../views/dashboard/MyAccount.vue'
 
@@ -27,6 +28,11 @@ const routes = [
     path: '/log-in',
     name: 'LogIn',
     component: LogIn
+  },
+  {
+    path: '/courses',
+    name: 'Courses',
+    component: Courses
   },
   {
     path: '/dashboard/my-account',

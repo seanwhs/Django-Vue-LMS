@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken', # added
     'corsheaders', # added
     'djoser', # added
+    'course',
 ]
 
 CORS_ALLOWED_ORIGINS = [

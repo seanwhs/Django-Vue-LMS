@@ -1,3 +1,4 @@
+<!-- views/dashboard/MyAccount.vue -->
 <template>
   <div class="about">
     <div class="hero is-info is-medium">
