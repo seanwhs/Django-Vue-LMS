@@ -6,7 +6,7 @@
     style="min-height: 5rem"
   >
     <div class="navbar-brand">
-      <a class="navbar-item is-size-4" href="/"> Learn Sphere </a>
+      <a class="navbar-item is-size-4" href="/"> LearnSphere </a>
     </div>
 
     <div id="navbar-item" class="navbar-menu">
