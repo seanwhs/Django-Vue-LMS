@@ -14,19 +14,25 @@
 </template>
 
 <script>
-import axios from 'axios'
+import axios from "axios";
+
 export default {
   methods: {
-    logout() {
-      console.log("logout");
+    async logout() {
+      const token = localStorage.getItem("token");
+      // Ensure the token exists before trying to tell the server
+      if (token) {
+        const config = { headers: { Authorization: `Token ${token}` } };
+        try {
+          await axios.post("/api/v1/token/logout/", {}, config);
+        } catch (error) {
+          console.log("Server session already gone.");
+        }
+      }
 
-      axios.defaults.headers.common["Authorization"] = "";
-
-      localStorage.removeItem("token");
-
-      this.$store.commit('removeToken')
-
-      this.$router.push('/')
+      // Always clear local state
+      this.$store.commit("removeToken");
+      this.$router.push("/");
     },
   },
 };

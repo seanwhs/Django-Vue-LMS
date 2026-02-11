@@ -82,7 +82,7 @@ export default {
       }
 
       if (this.password !== this.password2)  {
-        this.errors.push('Passwrods do not match!')
+        this.errors.push('Passwords do not match!')
       }
 
       if (this.errors.length){

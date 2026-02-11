@@ -1,3 +1,4 @@
+<!-- views/LogIn.vue -->
 <template>
   <div class="login">
     <div class="hero is-info is-medium">
