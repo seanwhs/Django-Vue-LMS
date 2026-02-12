@@ -1,3 +1,4 @@
+<!-- views/AboutView.vue -->
 <template>
   <div class="about">
     <div class="hero is-info is-medium">
