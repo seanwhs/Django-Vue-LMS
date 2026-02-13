@@ -8,6 +8,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
 
+WEBSITE_URL = 'http://127.0.0.1:8000'
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -26,7 +28,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:8080",
 ]
 
-REST_FRAMEWORK = {
+REST_FRAMEWORK = {  #added
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
@@ -100,3 +102,5 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "static/"
+MEDIA_URL = '/media/'   #added
+MEDIA_ROOT = BASE_DIR / 'media/'    #added

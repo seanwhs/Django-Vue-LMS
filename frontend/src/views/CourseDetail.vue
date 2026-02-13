@@ -26,15 +26,16 @@
 
                 <hr />
 
-                <article 
+                <article
                   class="media box"
-                  v-for = "comment in comments"
+                  v-for="comment in comments"
                   v-bind:key="comment.id"
                 >
                   <div class="media-content">
                     <div class="content">
                       <p>
-                        <strong>{{ comment.name }}</strong>{{ comment.created_at }} <br>
+                        <strong>{{ comment.name }}</strong
+                        >{{ comment.created_at }} <br />
                         {{ comment.content }}
                       </p>
                     </div>
@@ -59,12 +60,19 @@
                     </div>
                   </div>
 
+                  <div
+                    class="notification is-danger"
+                    v-for="error in errors"
+                    v-bind:key="error"
+                  >
+                    {{ error }}
+                  </div>
+
                   <div class="field">
                     <div class="control">
                       <button class="button is-link">Submit</button>
                     </div>
                   </div>
-
                 </form>
               </template>
               <template v-else>
@@ -90,6 +98,7 @@ export default {
     return {
       course_detail: {},
       lessons: [],
+      errors: [],
       comments: [],
       activeLesson: null,
       comment: {
@@ -108,33 +117,52 @@ export default {
     });
   },
   methods: {
-    submitComment(){
-      console.log('Submit Comment')
-      axios 
-      .post(`/api/v1/courses/${this.course_detail.slug}/${this.activeLesson.slug}/`, this.comment)
-      .then(response => {
-        alert('Thank for fo your kind comments!')
-        // Reset form on sccessful submission
-        this.comment.name = ''
-        this.comment.content = ''
-      })
-      .catch(error => {
-        console.log(error)
-      })
-    },
-    setActiveLesson(lesson){
-      this.activeLesson = lesson
-      this.getComments()
-    },
-    getComments(){
-      axios 
-      .get(`/api/v1/courses/${this.course_detail.slug}/${this.activeLesson.slug}/get-comments/`, this.comment)
-      .then(response => {
-        console.log(response.data)
+    submitComment() {
+      console.log("Submit Comment");
 
-        this.comments = response.data
-      })
-    }
-  }
+      this.errors = [];
+
+      if (this.comment.name === "") {
+        this.errors.push("Name is required!");
+      }
+
+      if (this.comment.content === "") {
+        this.errors.push("Content is required!");
+      }
+
+      if (!this.errors.length) {
+        axios
+          .post(
+            `/api/v1/courses/${this.course_detail.slug}/${this.activeLesson.slug}/`,
+            this.comment,
+          )
+          .then((response) => {
+            this.comments.push(response.data);
+            // Reset form on sccessful submission
+            this.comment.name = "";
+            this.comment.content = "";
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
+    },
+    setActiveLesson(lesson) {
+      this.activeLesson = lesson;
+      this.getComments();
+    },
+    getComments() {
+      axios
+        .get(
+          `/api/v1/courses/${this.course_detail.slug}/${this.activeLesson.slug}/get-comments/`,
+          this.comment,
+        )
+        .then((response) => {
+          console.log(response.data);
+
+          this.comments = response.data;
+        });
+    },
+  },
 };
 </script>

@@ -1,4 +1,5 @@
 # course/models.py
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -19,10 +20,18 @@ class Course(models.Model):
     short_description = models.TextField(blank=True, null=True)
     long_description = models.TextField(blank=True, null=True)
     created_at = models.DateField(auto_now_add=True)
+    image = models.ImageField(upload_to='uploads', blank=True, null=True)
 
     def __str__(self):
         categories_str = ", ".join([c.title for c in self.categories.all()])
         return f'Categories: {categories_str} | Title: {self.title}'
+    
+    def get_image(self):
+        if self.image:
+            return settings.WEBSITE_URL + self.image.url
+        else:
+            return "https://placehold.co/1280x960"
+        
 
 class Lesson(models.Model):
     DRAFT = 'draft'    
