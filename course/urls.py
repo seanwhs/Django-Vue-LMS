@@ -9,4 +9,5 @@ urlpatterns = [
     path('<slug:slug>/', get_course_detail, name='get-course-detail'), 
     path('<slug:course_slug>/<slug:lesson_slug>/', add_comment, name='add-comment'), 
     path('<slug:course_slug>/<slug:lesson_slug>/get-comments/', get_comments, name='get-comments'), 
+    path('<slug:course_slug>/<slug:lesson_slug>/get-quiz/', get_quiz, name='get-quiz'), 
 ]

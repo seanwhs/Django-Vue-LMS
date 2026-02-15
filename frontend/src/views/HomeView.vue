@@ -77,7 +77,7 @@ export default {
   mounted() {
     console.log("mounted");
     document.title = 'Welcome | LearnSphere'
-    axios.get("/api/v1/courses/get_frontpage_courses/").then((response) => {
+    axios.get("courses/get_frontpage_courses/").then((response) => {
       console.log(response.data);
       this.courses = response.data;
     });

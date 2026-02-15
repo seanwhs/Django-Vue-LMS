@@ -29,6 +29,7 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 REST_FRAMEWORK = {  #added
+    'DATETIME_FORMAT': '%d.%m.%Y %H:%M',
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],

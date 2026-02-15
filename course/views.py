@@ -11,6 +11,14 @@ from .serializers import *
 
 @api_view(["GET"])
 @permission_classes([AllowAny])
+def get_quiz(request, course_slug, lesson_slug):
+    lesson = get_object_or_404(Lesson, slug=lesson_slug)
+    quiz = lesson.quizzes.first()
+    serializer = QuizSerializer(quiz)
+    return Response(serializer.data)
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
 def get_categories(request):
     categories = Category.objects.all()
     serializer = CategorySerializer(categories, many=True)
@@ -56,12 +64,10 @@ def get_course_detail(request, slug):
         else {"title": course_detail.title, "slug": course_detail.slug}  # minimal info
     )
 
-    data = {
+    return Response({
         "course_detail": course_detail_data,
         "lessons": lessons,
-    }
-
-    return Response(data)
+    })
 
 
 @api_view(["GET"])
@@ -76,8 +82,6 @@ def get_comments(request, course_slug, lesson_slug):
 @permission_classes([IsAuthenticated])
 def add_comment(request, course_slug, lesson_slug):
     data = request.data
-    name = data.get("name")
-    content = data.get("content")
 
     course = Course.objects.get(slug=course_slug)
     lesson = Lesson.objects.get(slug=lesson_slug)
@@ -85,8 +89,8 @@ def add_comment(request, course_slug, lesson_slug):
     comment = Comment.objects.create(
         course=course,
         lesson=lesson,
-        name=name,
-        content=content,
+        name=data.get("name"),
+        content=data.get("content"),
         created_by=request.user,
     )
 

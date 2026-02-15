@@ -24,7 +24,7 @@ export default {
       if (token) {
         const config = { headers: { Authorization: `Token ${token}` } };
         try {
-          await axios.post("/api/v1/token/logout/", {}, config);
+          await axios.post("token/logout/", {}, config);
         } catch (error) {
           console.log("Server session already gone.");
         }

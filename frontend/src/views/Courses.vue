@@ -88,7 +88,7 @@ export default {
     document.title = "Courses | LearnSphere";
 
     const categoriesResponse = await axios.get(
-      "/api/v1/courses/get_categories/",
+      "courses/get_categories/",
     );
     this.categories = categoriesResponse.data;
 
@@ -101,7 +101,7 @@ export default {
       this.get_courses(); // Refresh the list with the new category filter
     },
     get_courses() {
-      let url = "/api/v1/courses/";
+      let url = "courses/";
       if (this.activeCategory) url += "?category_id=" + this.activeCategory.id;
 
       axios.get(url).then((response) => {
