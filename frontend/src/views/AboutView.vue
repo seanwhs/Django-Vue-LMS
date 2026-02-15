@@ -13,3 +13,11 @@
 
   </div>
 </template>
+
+<script>
+  export default{
+    mounted(){
+      document.title = 'About | LearnSphere'
+    }
+  }
+</script>

@@ -35,5 +35,8 @@ export default {
       this.$router.push("/");
     },
   },
+   mounted(){
+    document.title='My Account | LearnSphere'
+  },
 };
 </script>

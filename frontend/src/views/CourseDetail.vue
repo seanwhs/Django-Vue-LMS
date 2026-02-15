@@ -107,14 +107,15 @@ export default {
       },
     };
   },
-  mounted() {
+  async mounted() {
     console.log("mounted");
     const slug = this.$route.params.slug;
-    axios.get(`/api/v1/courses/${slug}/`).then((response) => {
+    await axios.get(`/api/v1/courses/${slug}/`).then((response) => {
       console.log(response.data);
       this.course_detail = response.data.course_detail;
       this.lessons = response.data.lessons;
     });
+    document.title = this.course_detail.title + '| LearnSphere'
   },
   methods: {
     submitComment() {
@@ -157,9 +158,8 @@ export default {
           `/api/v1/courses/${this.course_detail.slug}/${this.activeLesson.slug}/get-comments/`,
           this.comment,
         )
-        .then((response) => {
-          console.log(response.data);
 
+        .then((response) => {
           this.comments = response.data;
         });
     },

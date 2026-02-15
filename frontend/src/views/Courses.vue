@@ -85,30 +85,37 @@ export default {
     CourseItem,
   },
   async mounted() {
-    console.log("mounted");
+    document.title = "Courses | LearnSphere";
 
-    await axios.get("/api/v1/courses/get_categories/").then((response) => {
-      console.log(response.data);
+    const categoriesResponse = await axios.get(
+      "/api/v1/courses/get_categories/",
+    );
+    this.categories = categoriesResponse.data;
 
-      this.categories = response.data;
-    });
-    this.get_courses()
+    this.get_courses();
   },
+
   methods: {
     setActiveCategory(category) {
-      console.log(category);
       this.activeCategory = category;
-
-        this.get_courses();
+      this.get_courses(); // Refresh the list with the new category filter
     },
     get_courses() {
-      let url = "/api/v1/courses/"
-      if (this.activeCategory){
-        url += '?category_id=' + this.activeCategory.id
-      }
+      let url = "/api/v1/courses/";
+      if (this.activeCategory) url += "?category_id=" + this.activeCategory.id;
+
       axios.get(url).then((response) => {
-        console.log(response.data);
-        this.courses = response.data;
+        const isAuth = this.$store.state.user.isAuthenticated;
+
+        this.courses = response.data.map((course) => {
+          return isAuth
+            ? course
+            : {
+                id: course.id,
+                title: course.title,
+                slug: course.slug,
+              };
+        });
       });
     },
   },

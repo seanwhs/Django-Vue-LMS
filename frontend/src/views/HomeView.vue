@@ -42,7 +42,7 @@
           </div>
 
           <div class="column is-12 has-text-centered">
-            <a href="#" class="button is-info is-size-3 mt-6 mb-6"
+            <a href="/sign-up" class="button is-info is-size-3 mt-6 mb-6"
               >Start Learning</a
             >
           </div>
@@ -76,6 +76,7 @@ export default {
   },
   mounted() {
     console.log("mounted");
+    document.title = 'Welcome | LearnSphere'
     axios.get("/api/v1/courses/get_frontpage_courses/").then((response) => {
       console.log(response.data);
       this.courses = response.data;

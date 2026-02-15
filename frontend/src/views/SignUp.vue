@@ -68,6 +68,9 @@ export default {
       errors: []
     };
   },
+  mounted(){
+    document.title='Login | LearnSphere'
+  },
   methods: {
     submitForm() {
       console.log("submitForm");

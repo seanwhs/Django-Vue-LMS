@@ -10,7 +10,15 @@ class CategorySerializer(serializers.ModelSerializer):
 class CourseListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
-        fields = ('id', 'title', 'slug', 'short_description', 'get_image')
+        fields = ['id', 'title', 'slug', 'short_description', 'long_description', 'get_image']
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        request = self.context.get('request')
+        if not request.user.is_authenticated:
+            ret.pop('long_description', None)
+            ret.pop('short_description', None)
+        return ret
 
 class CourseDetailSerializer(serializers.ModelSerializer):
     class Meta:
@@ -20,7 +28,16 @@ class CourseDetailSerializer(serializers.ModelSerializer):
 class LessonListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lesson
-        fields = ('id', 'title', 'slug', 'short_description', 'long_description')
+        fields = ['id', 'title', 'slug', 'short_description', 'long_description']
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        request = self.context.get('request')
+        if not request.user.is_authenticated:
+            # Remove sensitive fields
+            ret.pop('long_description', None)
+            ret.pop('short_description', None)
+        return ret
 
 class CommentsSerializer(serializers.ModelSerializer):
     class Meta:

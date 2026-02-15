@@ -1,55 +1,79 @@
 # course/views.py
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404
+
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny, IsAuthenticated
+
 from .models import *
 from .serializers import *
 
+
 @api_view(["GET"])
+@permission_classes([AllowAny])
 def get_categories(request):
     categories = Category.objects.all()
     serializer = CategorySerializer(categories, many=True)
     return Response(serializer.data)
 
+
 @api_view(["GET"])
+@permission_classes([AllowAny])
 def get_courses(request):
-    category_id = request.GET.get('category_id', '')
+    category_id = request.GET.get("category_id", "")
     courses = Course.objects.all()
-    
+
     if category_id:
         courses = courses.filter(categories__in=[int(category_id)])
-        
-    serializer = CourseListSerializer(courses, many=True)
+
+    serializer = CourseListSerializer(courses, many=True, context={'request': request})
     return Response(serializer.data)
 
+
 @api_view(["GET"])
+@permission_classes([AllowAny])
 def get_frontpage_courses(request):
     courses = Course.objects.all()[0:4]
-    serializer = CourseListSerializer(courses, many=True)
+    serializer = CourseListSerializer(courses, many=True, context={'request': request})
     return Response(serializer.data)
 
 
 @api_view(["GET"])
+@permission_classes([AllowAny])
 def get_course_detail(request, slug):
-    course_detail = Course.objects.get(slug=slug)
-    course_detail_serializer = CourseDetailSerializer(course_detail)
-    lesson_serializer = LessonListSerializer(course_detail.lessons.all(), many=True)
+    course_detail = get_object_or_404(Course, slug=slug)
+    lesson_serializer = LessonListSerializer(course_detail.lessons.all(), many=True, context={'request': request})
+
+    # Filter lessons for unauthenticated users
+    lessons = lesson_serializer.data
+    if not request.user.is_authenticated:
+        for lesson in lessons:
+            lesson.pop("long_description", None)  # remove it
+
+    course_detail_data = (
+        CourseDetailSerializer(course_detail).data
+        if request.user.is_authenticated
+        else {"title": course_detail.title, "slug": course_detail.slug}  # minimal info
+    )
 
     data = {
-        "course_detail": course_detail_serializer.data,
-        "lessons": lesson_serializer.data,
+        "course_detail": course_detail_data,
+        "lessons": lessons,
     }
 
     return Response(data)
 
 
 @api_view(["GET"])
+@permission_classes([AllowAny])
 def get_comments(request, course_slug, lesson_slug):
     lesson = Lesson.objects.get(slug=lesson_slug)
     serializer = CommentsSerializer(lesson.comments.all(), many=True)
     return Response(serializer.data)
 
+
 @api_view(["POST"])
+@permission_classes([IsAuthenticated])
 def add_comment(request, course_slug, lesson_slug):
     data = request.data
     name = data.get("name")
@@ -67,5 +91,5 @@ def add_comment(request, course_slug, lesson_slug):
     )
 
     serializer = CommentsSerializer(comment)
-    
+
     return Response(serializer.data)
