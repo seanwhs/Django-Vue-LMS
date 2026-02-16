@@ -8,6 +8,19 @@
     </div>
 
     <section class="section">
+      <div class="columns is-multiline">
+        <div class="column is-12">
+          <h2 class="subtitle is-size-3">Your Active Courses</h2>
+        </div>
+        <div
+          class="column is-4"
+          v-for="course in courses"
+          v-bind:key="course_id"
+        >
+          <CourseItem :course="course" />
+        </div>
+      </div>
+      <hr />
       <button @click="logout()" class="button is-danger">Log Out</button>
     </section>
   </div>
@@ -15,8 +28,25 @@
 
 <script>
 import axios from "axios";
+import CourseItem from "@/components/CourseItem.vue";
 
 export default {
+  data() {
+    return {
+      courses: [],
+    };
+  },
+  components: {
+    CourseItem,
+  },
+  mounted() {
+    document.title = "My Account | LearnSphere";
+
+    axios.get("activities/get_active_courses/").then((response) => {
+      console.log(response.data);
+      this.courses = response.data;
+    });
+  },
   methods: {
     async logout() {
       const token = localStorage.getItem("token");
@@ -34,9 +64,6 @@ export default {
       this.$store.commit("removeToken");
       this.$router.push("/");
     },
-  },
-   mounted(){
-    document.title='My Account | LearnSphere'
   },
 };
 </script>

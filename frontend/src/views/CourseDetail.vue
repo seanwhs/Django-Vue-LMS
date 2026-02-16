@@ -24,6 +24,16 @@
                 <template v-if="activeLesson">
                   <h2>{{ activeLesson.title }}</h2>
 
+                  <span
+                    class="tag is-warning"
+                    v-if="activity.status == 'started'"
+                    @click="markAsDone"
+                    >Started (Mark as Done)</span
+                  >
+                  <span class="tag is-success" v-else>Done</span>
+
+                  <hr />
+
                   <div v-if="activeLesson.lesson_type !== 'quiz'">
                     {{ activeLesson.long_description }}
                   </div>
@@ -32,6 +42,10 @@
 
                   <template v-if="activeLesson.lesson_type === 'quiz'">
                     <Quiz v-bind:quiz="quiz" />
+                  </template>
+
+                  <template v-if="activeLesson.lesson_type === 'video'">
+                    <Video v-bind:youtube_id="activeLesson.youtube_id" />
                   </template>
 
                   <template v-if="activeLesson.lesson_type === 'article'">
@@ -70,11 +84,13 @@ import axios from "axios";
 import CourseComment from "@/components/CourseComment";
 import AddComment from "@/components/AddComment";
 import Quiz from "@/components/Quiz";
+import Video from "@/components/Video";
 export default {
   components: {
     CourseComment,
     AddComment,
-    Quiz
+    Quiz,
+    Video,
   },
   data() {
     return {
@@ -84,6 +100,7 @@ export default {
       quiz: {},
       comments: [],
       activeLesson: null,
+      activity: {},
     };
   },
   async mounted() {
@@ -107,6 +124,27 @@ export default {
       } else {
         this.getComments();
       }
+      this.trackStarted();
+    },
+    trackStarted() {
+      axios
+        .post(
+          `activities/track_started/${this.$route.params.slug}/${this.activeLesson.slug}/`,
+        )
+        .then((response) => {
+          console.log(response.data);
+          this.activity = response.data;
+        });
+    },
+    markAsDone() {
+      axios
+        .post(
+          `activities/mark_as_done/${this.$route.params.slug}/${this.activeLesson.slug}/`,
+        )
+        .then((response) => {
+          console.log(response.data);
+          this.activity = response.data;
+        });
     },
     getQuiz() {
       axios

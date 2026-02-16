@@ -9,4 +9,5 @@ urlpatterns = [
     path('api/v1/', include('djoser.urls')), # find this urls first
     path('api/v1/', include('djoser.urls.authtoken')), # find this url if previous did not work
     path('api/v1/courses/', include('course.urls')), 
+    path('api/v1/activities/', include('activity.urls')), 
 ] + static (settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

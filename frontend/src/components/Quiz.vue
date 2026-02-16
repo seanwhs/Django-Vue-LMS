@@ -1,3 +1,4 @@
+<!-- components/Quiz.vue -->
 <template>
        <h3>{{ quiz.question }}</h3>
 
