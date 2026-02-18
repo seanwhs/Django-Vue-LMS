@@ -23,12 +23,10 @@
                   </a>
                 </li>
 
-                <li
-                  v-for="category in categories"
-                  v-bind:key="category.id"
-                  @click="setActiveCategory(category)"
-                >
-                  <a href="#">{{ category.title }}</a>
+                <li v-for="category in categories" v-bind:key="category.id">
+                  <a @click="setActiveCategory(category)">{{
+                    category.title
+                  }}</a>
                 </li>
               </ul>
             </aside>
@@ -84,29 +82,53 @@ export default {
   components: {
     CourseItem,
   },
+  // This handles the case where the user clicks the "Courses" Nav link
+  // while already on this page.
+  beforeRouteUpdate(to, from, next) {
+    if (to.path === "/courses") {
+      this.activeCategory = null;
+      this.get_courses();
+    }
+    next();
+  },
   async mounted() {
     document.title = "Courses | LearnSphere";
 
-    const categoriesResponse = await axios.get(
-      "courses/get_categories/",
-    );
-    this.categories = categoriesResponse.data;
+    // 1. Fetch categories
+    try {
+      const categoriesResponse = await axios.get("courses/get_categories/");
+      this.categories = categoriesResponse.data;
 
+      // 2. Set the active category based on the URL so the UI highlight stays correct
+      const categoryId = this.$route.query.category_id;
+      if (categoryId) {
+        this.activeCategory = this.categories.find((c) => c.id == categoryId);
+      }
+    } catch (error) {
+      console.log("Error fetching categories:", error);
+    }
+
+    // 3. Fetch the courses
     this.get_courses();
   },
-
   methods: {
     setActiveCategory(category) {
-      this.activeCategory = category;
-      this.get_courses(); // Refresh the list with the new category filter
+      // By changing the URL, we trigger the :key in App.vue to refresh the component
+      if (category) {
+        this.$router
+          .push({ name: "Courses", query: { category_id: category.id } })
+          .catch(() => {});
+      } else {
+        this.$router.push({ name: "Courses" }).catch(() => {});
+      }
     },
     get_courses() {
       let url = "courses/";
-      if (this.activeCategory) url += "?category_id=" + this.activeCategory.id;
+      const categoryId = this.$route.query.category_id;
+      if (categoryId) url += "?category_id=" + categoryId;
 
       axios.get(url).then((response) => {
         const isAuth = this.$store.state.user.isAuthenticated;
-
         this.courses = response.data.map((course) => {
           return isAuth
             ? course
@@ -114,6 +136,7 @@ export default {
                 id: course.id,
                 title: course.title,
                 slug: course.slug,
+                get_image: course.get_image,
               };
         });
       });

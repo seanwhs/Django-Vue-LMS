@@ -2,7 +2,7 @@
 <template>
   <div>
     <Nav />
-    <router-view />
+    <router-view :key="$route.fullPath" />
     <Footer />
   </div>
 </template>
@@ -15,8 +15,8 @@ export default {
   name: "App",
   components: { Nav, Footer },
   beforeCreate() {
-    this.$store.commit('initializeStore');
-  }
+    this.$store.commit("initializeStore");
+  },
 };
 </script>
 

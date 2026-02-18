@@ -2,10 +2,16 @@
 <template>
   <div>
     <div class="courses">
-      <div class="hero is-info is-medium">
-        <div class="hero-body has-text-centered">
-          <h1 class="title">{{ course_detail.title }}</h1>
-        </div>
+      <div class="hero-body has-text-centered">
+        <h1 class="title">{{ course_detail.title }}</h1>
+        <router-link
+          :to="{name: 'Author', params: {id: course_detail.created_by.id}}"
+          class = 'subtitle' 
+          v-if="course_detail.created_by"
+        >
+          By {{ course_detail.created_by.first_name }}
+          {{ course_detail.created_by.last_name }}
+        </router-link>
       </div>
 
       <section class="section">
@@ -85,6 +91,7 @@ import CourseComment from "@/components/CourseComment";
 import AddComment from "@/components/AddComment";
 import Quiz from "@/components/Quiz";
 import Video from "@/components/Video";
+
 export default {
   components: {
     CourseComment,
@@ -94,7 +101,11 @@ export default {
   },
   data() {
     return {
-      course_detail: {},
+      course_detail: {
+        title: "",
+        created_by: null,
+        slug: ""
+      },
       lessons: [],
       errors: [],
       quiz: {},
@@ -104,14 +115,15 @@ export default {
     };
   },
   async mounted() {
-    console.log("mounted");
     const slug = this.$route.params.slug;
-    await axios.get(`courses/${slug}/`).then((response) => {
-      console.log(response.data);
+    try {
+      const response = await axios.get(`courses/${slug}/`);
       this.course_detail = response.data.course_detail;
       this.lessons = response.data.lessons;
-    });
-    document.title = this.course_detail.title + "| LearnSphere";
+      document.title = this.course_detail.title + " | LearnSphere";
+    } catch (error) {
+      console.error("Error fetching course details:", error);
+    }
   },
   methods: {
     submitComment(comment) {
@@ -119,53 +131,56 @@ export default {
     },
     setActiveLesson(lesson) {
       this.activeLesson = lesson;
-      if (lesson.lesson_type === "quiz") {
-        this.getQuiz();
-      } else {
-        this.getComments();
+
+      // Authenticated actions only
+      if (this.$store.state.user.isAuthenticated) {
+        if (lesson.lesson_type === "quiz") {
+          this.getQuiz();
+        } else {
+          this.getComments();
+        }
+        this.trackStarted();
       }
-      this.trackStarted();
     },
     trackStarted() {
+      if (!this.$store.state.user.isAuthenticated) return;
+
       axios
-        .post(
-          `activities/track_started/${this.$route.params.slug}/${this.activeLesson.slug}/`,
-        )
+        .post(`activities/track_started/${this.$route.params.slug}/${this.activeLesson.slug}/`)
         .then((response) => {
-          console.log(response.data);
           this.activity = response.data;
-        });
+        })
+        .catch(err => console.log("Tracking error:", err));
     },
     markAsDone() {
+      if (!this.$store.state.user.isAuthenticated) return;
+
       axios
-        .post(
-          `activities/mark_as_done/${this.$route.params.slug}/${this.activeLesson.slug}/`,
-        )
+        .post(`activities/mark_as_done/${this.$route.params.slug}/${this.activeLesson.slug}/`)
         .then((response) => {
-          console.log(response.data);
           this.activity = response.data;
-        });
+        })
+        .catch(err => console.log("Mark as done error:", err));
     },
     getQuiz() {
+      if (!this.$store.state.user.isAuthenticated) return;
+
       axios
-        .get(
-          `courses/${this.course_detail.slug}/${this.activeLesson.slug}/get-quiz/`,
-        )
+        .get(`courses/${this.course_detail.slug}/${this.activeLesson.slug}/get-quiz/`)
         .then((response) => {
-          console.log(response.data);
           this.quiz = response.data;
-        });
+        })
+        .catch(err => console.error("Quiz fetch error:", err));
     },
     getComments() {
-      axios
-        .get(
-          `courses/${this.course_detail.slug}/${this.activeLesson.slug}/get-comments/`,
-          this.comment,
-        )
+      if (!this.$store.state.user.isAuthenticated) return;
 
+      axios
+        .get(`courses/${this.course_detail.slug}/${this.activeLesson.slug}/get-comments/`)
         .then((response) => {
           this.comments = response.data;
-        });
+        })
+        .catch(err => console.error("Comments fetch error:", err));
     },
   },
 };

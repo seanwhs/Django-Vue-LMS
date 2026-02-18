@@ -10,33 +10,36 @@ export default createStore({
     },
   },
   getters: {},
-  mutations: {
-    initializeStore(state) {
-      if (localStorage.getItem("token")) {
-        state.user.token = localStorage.getItem("token");
-        state.user.isAuthenticated = true;
-        // ADD THIS LINE:
-        axios.defaults.headers.common["Authorization"] =
-          "Token " + state.user.token;
-      } else {
-        state.user.token = "";
-        state.user.isAuthenticated = false;
-        axios.defaults.headers.common["Authorization"] = "";
-      }
-    },
-    setToken(state, token) {
+// store/index.js
+
+mutations: {
+  initializeStore(state) {
+    const token = localStorage.getItem("token");
+    if (token) {
       state.user.token = token;
       state.user.isAuthenticated = true;
-      localStorage.setItem("token", token); // Store it for persistence
-      axios.defaults.headers.common["Authorization"] = "Token " + token; // Set header immediately
-    },
-    removeToken(state) {
+      axios.defaults.headers.common["Authorization"] = "Token " + token;
+    } else {
       state.user.token = "";
       state.user.isAuthenticated = false;
-      localStorage.removeItem("token"); // Clear it!
-      axios.defaults.headers.common["Authorization"] = "";
-    },
+      // Use delete to completely remove the header
+      delete axios.defaults.headers.common["Authorization"];
+    }
   },
+  setToken(state, token) {
+    state.user.token = token;
+    state.user.isAuthenticated = true;
+    localStorage.setItem("token", token);
+    axios.defaults.headers.common["Authorization"] = "Token " + token;
+  },
+  removeToken(state) {
+    state.user.token = "";
+    state.user.isAuthenticated = false;
+    localStorage.removeItem("token");
+    // Use delete here as well
+    delete axios.defaults.headers.common["Authorization"];
+  },
+},
   actions: {},
   modules: {},
 });

@@ -6,6 +6,7 @@ import SignUp from '../views/SignUp.vue'
 import LogIn from '../views/LogIn.vue'
 import Courses from '../views/Courses.vue'
 import CourseDetail from '../views/CourseDetail.vue'
+import Author from '../views/Author.vue'
 
 import MyAccount from '../views/dashboard/MyAccount.vue'
 
@@ -35,6 +36,11 @@ const routes = [
     name: 'Courses',
     component: Courses
   },
+ {
+  path: '/authors/:id',
+  name: 'Author',
+  component: Author
+},
   {
     path: '/courses/:slug',
     name: 'CourseDetail',
