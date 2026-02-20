@@ -18,14 +18,25 @@ class Category(models.Model):
 
 
 class Course(models.Model):
+    DRAFT = 'draft'
+    IN_REVIEW = 'in_review'
+    PUBLISHED = 'published'
+    
+    STATUS_CHOICES = (
+        (DRAFT, 'Draft'),
+        (IN_REVIEW, 'In Review'),
+        (PUBLISHED, 'Published')
+    )
+    
     categories = models.ManyToManyField(Category)
     title = models.CharField(max_length=255)
-    slug = models.SlugField()
+    slug = models.SlugField(max_length=255, unique=True)
     short_description = models.TextField(blank=True, null=True)
     long_description = models.TextField(blank=True, null=True)
     created_at = models.DateField(auto_now_add=True)
     created_by = models.ForeignKey(User, related_name='courses', on_delete=models.CASCADE)
     image = models.ImageField(upload_to='uploads', blank=True, null=True)
+    status = models.CharField(max_length=50, choices = STATUS_CHOICES, default=DRAFT)
 
     def __str__(self):
         categories_str = ", ".join([c.title for c in self.categories.all()])
@@ -59,12 +70,16 @@ class Lesson(models.Model):
     
     course = models.ForeignKey(Course, related_name='lessons', on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
-    slug = models.SlugField()
+    slug = models.SlugField(max_length=255)
     short_description = models.TextField(blank=True, null=True)
     long_description = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=20, choices = CHOICES_STATUS, default=PUBLISHED)
     lesson_type = models.CharField(max_length=20, choices = CHOICES_LESSON_TYPE, default=ARTICLE)
     youtube_id = models.CharField(max_length=20, blank=True, null=True)
+    
+    class Meta:
+        unique_together = ('course', 'slug')
+    
     
 class Comment(models.Model):
     course = models.ForeignKey(Course, related_name='comments', on_delete=models.CASCADE)
