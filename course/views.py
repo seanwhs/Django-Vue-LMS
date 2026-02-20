@@ -1,6 +1,7 @@
 # course/views.py
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
+from django.utils.text import slugify
 
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
@@ -9,6 +10,25 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from .models import *
 from .serializers import *
 
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def create_course(request):
+    print(request.data)
+    
+    course = Course.objects.create(
+        title=request.data.get('title'),
+        slug =slugify(request.data.get('title')),
+        short_description=request.data.get("short_description"),
+        long_description=request.data.get("long_description"),
+        created_by = request.user,
+    )
+    
+    for id in request.data.get('categories'):
+        course.categories.add(id)
+        
+    course.save()
+    
+    return Response({'yo':'yo'})
 
 @api_view(["GET"])
 @permission_classes([AllowAny])

@@ -27,6 +27,13 @@
           <div class="buttons">
             <router-link
               v-if="isAuthenticated"
+              to="/dashboard/create-course"
+              class="button is-primary has-text-white"
+            >
+              Create Course
+            </router-link>
+            <router-link
+              v-if="isAuthenticated"
               to="/dashboard/my-account"
               class="button is-info has-text-white"
             >
